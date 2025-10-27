@@ -72,7 +72,11 @@ ChainTypes.operations= {
   actor_talent_trigger:  42,
   actor_movement:        43,
   actor_grown_operation: 44,
-  narrate_log_operation: 45
+  actor_talk_operation:  45,
+
+  narrate_log_operation: 46,
+
+  shutdown_siming_operation: 47
 };
 
 //types.hpp

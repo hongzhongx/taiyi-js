@@ -1,5 +1,6 @@
 import types from "./types"
 import SerializerImpl from "./serializer"
+import { act } from "react"
 
 const {
     //id_type,
@@ -519,7 +520,11 @@ operation.st_operations = [
     actor_talent_trigger,
     actor_movement,
     actor_grown_operation,
-    narrate_log_operation
+    actor_talk_operation,
+
+    narrate_log_operation,
+
+    shutdown_siming_operation
   ];
 
 let transaction = new Serializer(
