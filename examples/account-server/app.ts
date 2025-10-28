@@ -24,7 +24,7 @@ if(creator_name == "" || creator_key == "")
     die("Can not create account without CREATOR_NAME or CREATOR_WIF set");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-app.post('/create', async (req, res) => {
+app.post('/create_account', async (req, res) => {
     console.log(req.body);
     req.body = req.body?req.body:{};
 	var name = req.body.username?req.body.username:"";
@@ -80,6 +80,36 @@ app.post('/create', async (req, res) => {
 
         console.log(`[${(new Date()).toLocaleTimeString()}] transfer some qi to ${name}.`);
 
+
+        res.send({
+            "status" : true,
+			"name" : name
+		});
+        return;
+	} catch(err) {
+        var logTime = new Date();
+        console.log(`[${logTime.toLocaleTimeString()}] create ${name} error!`);
+        console.log(err.toString());
+        if(err.payload)
+            console.log(err.payload)
+        res.send({status:false, err:err.toString()});
+        return;
+    };
+});
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+app.post('/give_me_yantongshi', async (req, res) => {
+    console.log(req.body);
+    req.body = req.body?req.body:{};
+	var name = req.body.username?req.body.username:"";
+
+	if(name == "") {
+		let e = "can not give fabao to account without username";
+        console.warn(e);
+        res.send({status:false, err:e});
+        return;
+	}
+
+    try {
         // 赠送一个“衍童石”
         const tx = await taiyi.broadcast.createNfaAsync(
             creator_key,
@@ -97,30 +127,7 @@ app.post('/create', async (req, res) => {
             }
         });
 
-        console.log(`[${(new Date()).toLocaleTimeString()}] create new nfa to ${creator_name}.`);
-
-        // 给衍童石注入材质
-        await taiyi.broadcast.actionNfaAsync(
-            creator_key,
-            creator_name,
-            4,
-            "inject_material_to_nfa",
-            [],
-            [JSON.stringify([new_nfa, 2000, "FABR"])]
-        );
-
-        console.log(`[${(new Date()).toLocaleTimeString()}] inject_material_to_nfa #${new_nfa}.`);
-
-        await taiyi.broadcast.actionNfaAsync(
-            creator_key,
-            creator_name,
-            new_nfa,
-            "deposit_resource",
-            [],
-            [JSON.stringify([300000, "GOLD"])]
-        );
-
-        console.log(`[${(new Date()).toLocaleTimeString()}] deposit_resource gold to #${new_nfa}.`);
+        console.log(`[${(new Date()).toLocaleTimeString()}] create new nfa #${new_nfa}.`);
 
         await taiyi.broadcast.transferNfaAsync(
             creator_key,
@@ -139,7 +146,94 @@ app.post('/create', async (req, res) => {
         return;
 	} catch(err) {
         var logTime = new Date();
-        console.log(`[${logTime.toLocaleTimeString()}] create ${name} error!`);
+        console.log(`[${logTime.toLocaleTimeString()}] create nfa for ${name} error!`);
+        console.log(err.toString());
+        if(err.payload)
+            console.log(err.payload)
+        res.send({status:false, err:err.toString()});
+        return;
+    };
+});
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+app.post('/inject_material_to_nfa', async (req, res) => {
+    console.log(req.body);
+    req.body = req.body?req.body:{};
+	var nfa_id = req.body.nfa?req.body.nfa:null;
+    var amount = req.body.amount?req.body.amount:0;
+    var type = req.body.type?req.body.type:"";
+
+	if(nfa_id == null || amount <= 0 || type == "") {
+		let e = "can not inject material to nfa without nfa id or amount or type";
+        console.warn(e);
+        res.send({status:false, err:e});
+        return;
+	}
+
+    try {
+
+        // 给衍童石注入材质
+        await taiyi.broadcast.actionNfaAsync(
+            creator_key,
+            creator_name,
+            4,
+            "inject_material_to_nfa",
+            [],
+            [JSON.stringify([Number(nfa_id), Number(amount), type])]
+        );
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] inject_material_to_nfa #${nfa_id}.`);
+
+        res.send({
+            "status" : true,
+            "nfa" : nfa_id
+		});
+        return;
+	} catch(err) {
+        var logTime = new Date();
+        console.log(`[${logTime.toLocaleTimeString()}] inject material to nfa #${nfa_id} error!`);
+        console.log(err.toString());
+        if(err.payload)
+            console.log(err.payload)
+        res.send({status:false, err:err.toString()});
+        return;
+    };
+});
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+app.post('/deposit_resource_to_nfa', async (req, res) => {
+    console.log(req.body);
+    req.body = req.body?req.body:{};
+	var nfa_id = req.body.nfa?req.body.nfa:null;
+    var amount = req.body.amount?req.body.amount:0;
+    var type = req.body.type?req.body.type:"";
+
+	if(nfa_id == null || amount <= 0 || type == "") {
+		let e = "can not deposit resource to nfa without nfa id or amount or type";
+        console.warn(e);
+        res.send({status:false, err:e});
+        return;
+	}
+
+    try {
+
+        await taiyi.broadcast.actionNfaAsync(
+            creator_key,
+            creator_name,
+            nfa_id,
+            "deposit_resource",
+            [],
+            [JSON.stringify([Number(amount), type])]
+        );
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] deposit_resource to #${nfa_id}.`);
+
+        res.send({
+            "status" : true,
+            "nfa" : nfa_id
+		});
+        return;
+	} catch(err) {
+        var logTime = new Date();
+        console.log(`[${logTime.toLocaleTimeString()}] deposit resource to nfa #${nfa_id} error!`);
         console.log(err.toString());
         if(err.payload)
             console.log(err.payload)
