@@ -84,7 +84,7 @@ app.post('/create', async (req, res) => {
         const tx = await taiyi.broadcast.createNfaAsync(
             creator_key,
             creator_name,
-            "nfa.fabao.yantongshi"
+            "nfa.fabao.yantongshi2"
         )
 
         const tx_result = await taiyi.api.getTransactionResultsAsync(tx.id);
@@ -98,6 +98,29 @@ app.post('/create', async (req, res) => {
         });
 
         console.log(`[${(new Date()).toLocaleTimeString()}] create new nfa to ${creator_name}.`);
+
+        // 给衍童石注入材质
+        await taiyi.broadcast.actionNfaAsync(
+            creator_key,
+            creator_name,
+            4,
+            "inject_material_to_nfa",
+            [],
+            [JSON.stringify([new_nfa, 2000, "FABR"])]
+        );
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] inject_material_to_nfa #${new_nfa}.`);
+
+        await taiyi.broadcast.actionNfaAsync(
+            creator_key,
+            creator_name,
+            new_nfa,
+            "deposit_resource",
+            [],
+            [JSON.stringify([300000, "GOLD"])]
+        );
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] deposit_resource gold to #${new_nfa}.`);
 
         await taiyi.broadcast.transferNfaAsync(
             creator_key,
