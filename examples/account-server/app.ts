@@ -242,6 +242,131 @@ app.post('/deposit_resource_to_nfa', async (req, res) => {
     };
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+//DEPRECATED
+app.post('/create', async (req, res) => {
+    console.log(req.body);
+    req.body = req.body?req.body:{};
+	var name = req.body.username?req.body.username:"";
+	var pass = req.body.password?req.body.password:"";
+
+	if(name == "" || pass == "") {
+		let e = "can not create new account without username and password";
+        console.warn(e);
+        res.send({status:false, err:e});
+        return;
+	}
+
+    console.log(`[${(new Date()).toLocaleTimeString()}] new account for ${name}`);
+
+    try {
+        const keys = taiyi.auth.generateKeys(name, pass, ['posting', 'active', 'owner', 'memo']);
+        const chainProps = await taiyi.api.getChainPropertiesAsync()
+        await taiyi.broadcast.accountCreateAsync(
+            creator_key,
+            chainProps.account_creation_fee,
+            creator_name,
+            name,
+            {
+                weight_threshold: 1,
+                account_auths: [],
+                key_auths: [[keys.owner, 1]],
+            },
+            {
+                weight_threshold: 1,
+                account_auths: [],
+                key_auths: [[keys.active, 1]],
+            },
+            {
+                weight_threshold: 1,
+                account_auths: [],
+                key_auths: [[keys.posting, 1]],
+            },
+            keys.memo,
+            ""     
+        )
+
+        // check
+        const [newAcc] = await taiyi.api.getAccountsAsync([name])
+		console.log(`[${(new Date()).toLocaleTimeString()}] Account ${name}(id=${newAcc.id}) has been created.`);
+
+        // 赠送一点真气
+        await taiyi.broadcast.transferToQiAsync(
+            creator_key,
+            creator_name,
+            name,
+            "1.000 YANG"          
+        )
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] transfer some qi to ${name}.`);
+
+        // 赠送一个“衍童石”
+        const tx = await taiyi.broadcast.createNfaAsync(
+            creator_key,
+            creator_name,
+            "nfa.fabao.yantongshi2"
+        )
+
+        const tx_result = await taiyi.api.getTransactionResultsAsync(tx.id);
+        let new_nfa = null;
+        tx_result.forEach( (result) => {
+            // console.log(JSON.stringify(result));
+            if(result.type == "contract_result") {
+                let cresult = result.value;
+                new_nfa = cresult.contract_affecteds[0].value.affected_item;
+            }
+        });
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] create new nfa to ${creator_name}.`);
+
+        // 给衍童石注入材质
+        await taiyi.broadcast.actionNfaAsync(
+            creator_key,
+            creator_name,
+            4,
+            "inject_material_to_nfa",
+            [],
+            [JSON.stringify([new_nfa, 2000, "FABR"])]
+        );
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] inject_material_to_nfa #${new_nfa}.`);
+
+        await taiyi.broadcast.actionNfaAsync(
+            creator_key,
+            creator_name,
+            new_nfa,
+            "deposit_resource",
+            [],
+            [JSON.stringify([300000, "GOLD"])]
+        );
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] deposit_resource gold to #${new_nfa}.`);
+
+        await taiyi.broadcast.transferNfaAsync(
+            creator_key,
+            creator_name,
+            name,
+            new_nfa
+        )
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] transfer new nfa to ${name}.`);
+
+        res.send({
+            "status" : true,
+			"name" : name,
+            "new_nfa" : new_nfa
+		});
+        return;
+	} catch(err) {
+        var logTime = new Date();
+        console.log(`[${logTime.toLocaleTimeString()}] create ${name} error!`);
+        console.log(err.toString());
+        if(err.payload)
+            console.log(err.payload)
+        res.send({status:false, err:err.toString()});
+        return;
+    };
+});
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const args = require('minimist')(process.argv.slice(2));
 
