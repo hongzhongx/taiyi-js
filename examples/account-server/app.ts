@@ -110,11 +110,14 @@ app.post('/give_me_yantongshi', async (req, res) => {
 	}
 
     try {
-        // 赠送一个“衍童石”
-        const tx = await taiyi.broadcast.createNfaAsync(
+        // 创建一个“衍童石”
+        const tx = await taiyi.broadcast.callContractFunctionAsync(
             creator_key,
             creator_name,
-            "nfa.fabao.yantongshi2"
+            "contract.nfa.manager",
+            "create_nfa_to_me",
+            [],
+            [JSON.stringify(["nfa.fabao.yantongshi"])]
         )
 
         const tx_result = await taiyi.api.getTransactionResultsAsync(tx.id);
@@ -129,11 +132,14 @@ app.post('/give_me_yantongshi', async (req, res) => {
 
         console.log(`[${(new Date()).toLocaleTimeString()}] create new nfa #${new_nfa}.`);
 
-        await taiyi.broadcast.transferNfaAsync(
+        // 转给用户
+        await taiyi.broadcast.callContractFunctionAsync(
             creator_key,
             creator_name,
-            name,
-            new_nfa
+            "contract.nfa.manager",
+            "transfer_nfa_to_account",
+            [],
+            [JSON.stringify([name, Number(new_nfa)])]
         )
 
         console.log(`[${(new Date()).toLocaleTimeString()}] transfer new nfa to ${name}.`);
@@ -175,7 +181,7 @@ app.post('/inject_material_to_nfa', async (req, res) => {
         await taiyi.broadcast.actionNfaAsync(
             creator_key,
             creator_name,
-            4,
+            6,
             "inject_material_to_nfa",
             [],
             [JSON.stringify([Number(nfa_id), Number(amount), type])]
@@ -191,6 +197,72 @@ app.post('/inject_material_to_nfa', async (req, res) => {
 	} catch(err) {
         var logTime = new Date();
         console.log(`[${logTime.toLocaleTimeString()}] inject material to nfa #${nfa_id} error!`);
+        console.log(err.toString());
+        if(err.payload)
+            console.log(err.payload)
+        res.send({status:false, err:err.toString()});
+        return;
+    };
+});
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+app.post('/give_me_actor', async (req, res) => {
+    console.log(req.body);
+    req.body = req.body?req.body:{};
+	var name = req.body.username?req.body.username:"";
+    var family_name = req.body.family_name?req.body.family_name:"";
+    var last_name = req.body.last_name?req.body.last_name:"";
+
+	if(name == "" || family_name == "" || last_name == "") {
+		let e = "can not give actor to account without username or family name or last name";
+        console.warn(e);
+        res.send({status:false, err:e});
+        return;
+	}
+
+    try {
+        // 创建一个角色
+        const tx = await taiyi.broadcast.callContractFunctionAsync(
+            creator_key,
+            creator_name,
+            "contract.nfa.manager",
+            "create_actor",
+            [],
+            [JSON.stringify([family_name, last_name])]
+        )
+
+        const tx_result = await taiyi.api.getTransactionResultsAsync(tx.id);
+        let new_nfa = null;
+        tx_result.forEach( (result) => {
+            // console.log(JSON.stringify(result));
+            if(result.type == "contract_result") {
+                let cresult = result.value;
+                new_nfa = cresult.contract_affecteds[0].value.affected_item;
+            }
+        });
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] create new nfa #${new_nfa}.`);
+
+        // 转给用户
+        await taiyi.broadcast.callContractFunctionAsync(
+            creator_key,
+            creator_name,
+            "contract.nfa.manager",
+            "transfer_nfa_to_account",
+            [],
+            [JSON.stringify([name, Number(new_nfa)])]
+        )
+
+        console.log(`[${(new Date()).toLocaleTimeString()}] transfer new nfa to ${name}.`);
+
+        res.send({
+            "status" : true,
+			"name" : name,
+            "new_nfa" : new_nfa
+		});
+        return;
+	} catch(err) {
+        var logTime = new Date();
+        console.log(`[${logTime.toLocaleTimeString()}] create actor for ${name} error!`);
         console.log(err.toString());
         if(err.payload)
             console.log(err.payload)
@@ -300,10 +372,13 @@ app.post('/create', async (req, res) => {
         console.log(`[${(new Date()).toLocaleTimeString()}] transfer some qi to ${name}.`);
 
         // 赠送一个“衍童石”
-        const tx = await taiyi.broadcast.createNfaAsync(
+        const tx = await taiyi.broadcast.callContractFunctionAsync(
             creator_key,
             creator_name,
-            "nfa.fabao.yantongshi2"
+            "contract.nfa.manager",
+            "create_nfa_to_me",
+            [],
+            [JSON.stringify(["nfa.fabao.yantongshi"])]
         )
 
         const tx_result = await taiyi.api.getTransactionResultsAsync(tx.id);
@@ -322,7 +397,7 @@ app.post('/create', async (req, res) => {
         await taiyi.broadcast.actionNfaAsync(
             creator_key,
             creator_name,
-            4,
+            6,
             "inject_material_to_nfa",
             [],
             [JSON.stringify([new_nfa, 2000, "FABR"])]
@@ -382,3 +457,37 @@ const server = app.listen(8080, () => {
 	let port = info.port;
 	console.log('Http server listening at http://%s:%s', host, port);
 });
+
+
+
+async function test_op() {
+    try 
+    {
+        // await taiyi.broadcast.actionNfaAsync(
+        //     creator_key,
+        //     creator_name,
+        //     10,
+        //     "set_contract_permission",
+        //     [],
+        //     [JSON.stringify(["contract.nfa.luyin", 1])]
+        // );
+
+        await taiyi.broadcast.callContractFunctionAsync(
+            creator_key,
+            creator_name,
+            "contract.nfa.manager",
+            "create_actor",
+            [],
+            [JSON.stringify(["李", "小明"])]
+        )
+
+        console.log("test_op success");
+	} 
+    catch(err) {
+        console.log(err.toString());
+        if(err.payload)
+            console.log(err.payload)
+    };
+}
+
+//test_op();

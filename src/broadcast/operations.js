@@ -1,41 +1,6 @@
 module.exports = [
   {
     "roles": ["active", "owner"],
-    "operation": "transfer",
-    "params": [
-      "from",
-      "to",
-      "amount",
-      "memo"
-    ]
-  },
-  {
-    "roles": ["active"],
-    "operation": "transfer_to_qi",
-    "params": [
-      "from",
-      "to",
-      "amount"
-    ]
-  },
-  {
-    "roles": ["active", "owner"],
-    "operation": "withdraw_qi",
-    "params": [
-      "account",
-      "qi"
-    ]
-  },
-  {
-    "roles": ["active", "owner"],
-    "operation": "price",
-    "params": [
-      "base",
-      "quote"
-    ]
-  },
-  {
-    "roles": ["active", "owner"],
     "operation": "account_create",
     "params": [
       "fee",
@@ -62,13 +27,67 @@ module.exports = [
   },
   {
     "roles": ["active", "owner"],
+    "operation": "transfer",
+    "params": [
+      "from",
+      "to",
+      "amount",
+      "memo"
+    ]
+  },
+  {
+    "roles": ["active", "owner"],
+    "operation": "transfer_to_qi",
+    "params": [
+      "from",
+      "to",
+      "amount"
+    ]
+  },
+  {
+    "roles": ["active", "owner"],
+    "operation": "withdraw_qi",
+    "params": [
+      "account",
+      "qi"
+    ]
+  },
+  {
+    "roles": ["active", "owner"],
+    "operation": "set_withdraw_qi_route",
+    "params": [
+      "from_account",
+      "to_account",
+      "percent",
+      "auto_vest"
+    ]
+  },
+  {
+    "roles": ["active", "owner"],
+    "operation": "delegate_qi",
+    "params": [
+      "delegator",
+      "delegatee",
+      "qi"
+    ]
+  },
+  {
+    "roles": ["active", "owner"],
     "operation": "siming_update",
     "params": [
       "owner",
       "url",
       "block_signing_key",
       "props",
-      "fee"
+    ]
+  },
+  {
+    "roles": ["active", "owner"],
+    "operation": "siming_set_properties",
+    "params": [
+      "owner",
+      "props",
+      "extensions"
     ]
   },
   {
@@ -89,6 +108,14 @@ module.exports = [
     ]
   },
   {
+    "roles": ["owner"],
+    "operation": "decline_adoring_rights",
+    "params": [
+      "account",
+      "decline"
+    ]
+  },
+  {
     "roles": ["active", "owner"],
     "operation": "custom",
     "params": [
@@ -105,16 +132,6 @@ module.exports = [
       "required_posting_auths",
       "id",
       "json"
-    ]
-  },
-  {
-    "roles": ["active", "owner"],
-    "operation": "set_withdraw_qi_route",
-    "params": [
-      "from_account",
-      "to_account",
-      "percent",
-      "auto_vest"
     ]
   },
   {
@@ -147,32 +164,6 @@ module.exports = [
     ]
   },
   {
-    "roles": ["owner"],
-    "operation": "decline_adoring_rights",
-    "params": [
-      "account",
-      "decline"
-    ]
-  },
-  {
-    "roles": ["active", "owner"],
-    "operation": "reset_account",
-    "params": [
-      "reset_account",
-      "account_to_reset",
-      "new_owner_authority"
-    ]
-  },
-  {
-    "roles": ["owner", "posting"],
-    "operation": "set_reset_account",
-    "params": [
-      "account",
-      "current_reset_account",
-      "reset_account"
-    ]
-  },
-  {
     "roles": ["posting", "active", "owner"],
     "operation": "claim_reward_balance",
     "params": [
@@ -184,47 +175,41 @@ module.exports = [
   },
   {
     "roles": ["active", "owner"],
-    "operation": "delegate_qi",
-    "params": [
-      "delegator",
-      "delegatee",
-      "qi"
-    ]
-  },
-  {
-    "roles": ["active", "owner"],
-    "operation": "siming_set_properties",
+    "operation": "create_contract",
     "params": [
       "owner",
-      "props",
+      "name",
+      "data",
       "extensions"
     ]
   },
   {
-    "roles": ["active"],
-    "operation": "create_actor",
+    "roles": ["active", "owner"],
+    "operation": "revise_contract",
     "params": [
-      "fee",
-      "creator",
-      "family_name",
-      "last_name"
+      "reviser",
+      "contract_name",
+      "data",
+      "extensions"
     ]
   },
   {
-    "roles": ["active"],
-    "operation": "create_nfa",
+    "roles": ["active", "owner"],
+    "operation": "release_contract",
     "params": [
-      "creator",
-      "symbol"
+      "owner",
+      "contract_name"
     ]
   },
   {
-    "roles": ["active"],
-    "operation": "transfer_nfa",
+    "roles": ["active", "owner"],
+    "operation": "call_contract_function",
     "params": [
-      "from",
-      "to",
-      "id"
+      "caller",
+      "contract_name",
+      "function_name",
+      "value_list",
+      "extensions"
     ]
   },
   {

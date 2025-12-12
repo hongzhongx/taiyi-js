@@ -36,47 +36,55 @@ ChainTypes.operations= {
   // contract
   create_contract:       18,
   revise_contract:       19,
-  call_contract_function:20,
+  release_contract:      20,
+  call_contract_function: 21,
 
   // nfa (non fungible asset)
-  create_nfa_symbol:     21,
-  create_nfa:            22,
-  transfer_nfa:          23,
-  approve_nfa_active:    24,
-  action_nfa:            25,
-
-  // zone
-  create_zone:           26,
-
-  // actor
-  create_actor_talent_rule: 27,
-  create_actor:          28,
+  action_nfa:            22,
 
   //**** virtual operations below this point
-  hardfork:              29,
-  fill_qi_withdraw:      30,
-  return_qi_delegation:  31,
-  producer_reward:       32,
+  hardfork:              23,
+  fill_qi_withdraw:      24,
+  return_qi_delegation:  25,
+  producer_reward:       26,
 
-  nfa_convert_resources: 33,
-  nfa_trasfer:           34,
-  nfa_deposit_withdraw:  35,
-  reward_feigang:        36,
-  reward_cultivation:    37,
+  nfa_symbol_create:        27,
+  nfa_symbol_authority_change: 28,
+  nfa_create:               29,
+  nfa_transfer:             30,
+  nfa_active_approve:       31,
+  nfa_convert_resources:    32,
+  nfa_asset_transfer:       33,
+  nfa_deposit_withdraw:     34,
 
-  tiandao_year_change:   38,
-  tiandao_month_change:  39,
-  tiandao_time_change:   40,
+  reward_feigang:           35,
+  reward_cultivation:       36,
 
-  actor_born:            41,
-  actor_talent_trigger:  42,
-  actor_movement:        43,
-  actor_grown_operation: 44,
-  actor_talk_operation:  45,
+  tiandao_year_change:      37,
+  tiandao_month_change:     38,
+  tiandao_time_change:      39,
 
-  narrate_log_operation: 46,
+  actor_talent_rule_create: 40,
+  actor_create:             41,
+  actor_born:               42,
+  actor_talent_trigger:     43,
+  actor_movement:           44,
+  actor_grown:              45,
+  actor_talk:               46,
 
-  shutdown_siming_operation: 47
+  zone_create:              47,
+  zone_type_change:         48,
+  zone_connect:             49,
+
+  narrate_log:              50,
+
+  shutdown_siming:          51,
+
+  create_proposal:          52,
+  update_proposal_votes:    53,
+  remove_proposal:          54,
+  proposal_execute_operation:  55
+
 };
 
 //types.hpp
