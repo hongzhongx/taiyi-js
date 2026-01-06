@@ -67,23 +67,21 @@ ChainTypes.operations= {
   actor_talent_rule_create: 40,
   actor_create:             41,
   actor_born:               42,
-  actor_talent_trigger:     43,
-  actor_movement:           44,
-  actor_grown:              45,
-  actor_talk:               46,
+  actor_movement:           43,
+  actor_talk:               44,
 
-  zone_create:              47,
-  zone_type_change:         48,
-  zone_connect:             49,
+  zone_create:              45,
+  zone_type_change:         46,
+  zone_connect:             47,
 
-  narrate_log:              50,
+  narrate_log:              48,
 
-  shutdown_siming:          51,
+  shutdown_siming:          49,
 
-  create_proposal:          52,
-  update_proposal_votes:    53,
-  remove_proposal:          54,
-  proposal_execute_operation:  55
+  create_proposal:          50,
+  update_proposal_votes:    51,
+  remove_proposal:          52,
+  proposal_execute_operation:  53
 
 };
 

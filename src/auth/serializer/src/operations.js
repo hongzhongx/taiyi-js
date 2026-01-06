@@ -547,19 +547,6 @@ const actor_born = new Serializer(
     }
 );
 
-const actor_talent_trigger = new Serializer(
-    "actor_talent_trigger",
-    {
-        owner: string,
-        name: string,
-        nfa: int64,
-        tid: int64,
-        title: string,
-        desc: string,
-        age: uint32
-    }
-);
-
 const actor_movement = new Serializer(
     "actor_movement",
     {
@@ -568,22 +555,6 @@ const actor_movement = new Serializer(
         from_zone: string,
         to_zone: string,
         nfa: int64
-    }
-);
-
-const actor_grown = new Serializer(
-    "actor_grown",
-    {
-        owner: string,
-        name: string,
-        nfa: int64,
-        years: uint32,
-        months: uint32,
-        days: uint32,
-        tod: uint32,
-        times: uint32,
-        age: uint32,
-        health: int64
     }
 );
 
@@ -759,23 +730,21 @@ operation.st_operations = [
     actor_talent_rule_create, //40
     actor_create,             //41
     actor_born,               //42
-    actor_talent_trigger,     //43
-    actor_movement,           //44
-    actor_grown,              //45
-    actor_talk,               //46
+    actor_movement,           //43
+    actor_talk,               //44
 
-    zone_create,              //47
-    zone_type_change,         //48
-    zone_connect,             //49
+    zone_create,              //45
+    zone_type_change,         //46
+    zone_connect,             //47
 
-    narrate_log,              //50
+    narrate_log,              //48
 
-    shutdown_siming,          //51
+    shutdown_siming,          //49
 
-    create_proposal,          //52
-    update_proposal_votes,    //53
-    remove_proposal,          //54
-    proposal_execute          //55
+    create_proposal,          //50
+    update_proposal_votes,    //51
+    remove_proposal,          //52
+    proposal_execute          //53
   ];
 
 const transaction = new Serializer(
