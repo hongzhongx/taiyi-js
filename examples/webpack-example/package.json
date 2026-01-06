@@ -10,6 +10,6 @@
     "webpack": "^3.0.0"
   },
   "dependencies": {
-    "@taiyinet/taiyi": "^0.0.1"
+    "@taiyinet/taiyi": "^0.0.5"
   }
 }
