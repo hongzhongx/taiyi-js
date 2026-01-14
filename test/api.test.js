@@ -114,7 +114,7 @@ describe('taiyi.api:', function () {
       let attempts = 0;
       taiyiApi.setOptions({
         url: 'http://127.0.0.1:8091',
-        fetchMethod: (uri, req) => new Promise((res, rej) => {
+        fetchMethod: (uri, req) => new Promise((res) => {
           const data = JSON.parse(req.body);
           res({
             ok: true,
@@ -142,10 +142,9 @@ describe('taiyi.api:', function () {
         }),
       });
 
-      let result;
       let errored = false;
       try {
-        result = await taiyiApi.getAccountsAsync(['hongzhong'])
+        await taiyiApi.getAccountsAsync(['hongzhong'])
       } catch (e) {
         errored = true;
       }
@@ -157,7 +156,7 @@ describe('taiyi.api:', function () {
       let attempts = 0;
       taiyiApi.setOptions({
         url: 'http://127.0.0.1:8091',
-        fetchMethod: (uri, req) => new Promise((res, rej) => {
+        fetchMethod: (uri, req) => new Promise((res) => {
           const data = JSON.parse(req.body);
           res({
             ok: true,
@@ -218,7 +217,7 @@ describe('taiyi.api:', function () {
           retries: 3,
           minTimeout: 1, // 1ms
         },
-        fetchMethod: (uri, req) => new Promise((res, rej) => {
+        fetchMethod: (uri, req) => new Promise((res) => {
           const data = JSON.parse(req.body);
           res({
             ok: 'true',
@@ -276,4 +275,110 @@ describe('taiyi.api:', function () {
     it('does not retry non-retriable operations');
   });
 
+  describe('baiyujing_api', () => {
+    let taiyiApi;
+    beforeEach(() => {
+      taiyiApi = new api.Taiyi({});
+    });
+
+    const mockRpc = (apiInstance) => {
+      let callParams;
+      apiInstance.setOptions({
+        url: 'http://127.0.0.1:8091',
+        fetchMethod: (uri, req) => {
+          const data = JSON.parse(req.body);
+          callParams = data;
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({
+              jsonrpc: '2.0',
+              id: data.id,
+              result: { success: true },
+            }),
+          });
+        },
+      });
+      return () => callParams;
+    };
+
+    it('get_version works', async () => {
+      const getParams = mockRpc(taiyiApi);
+      await taiyiApi.getVersionAsync();
+      const params = getParams();
+      assert.equal(params.params[0], 'baiyujing_api');
+      assert.equal(params.params[1], 'get_version');
+    });
+
+    it('get_state works', async () => {
+        const getParams = mockRpc(taiyiApi);
+        await taiyiApi.getStateAsync('/trending');
+        const params = getParams();
+        assert.equal(params.params[1], 'get_state');
+        assert.deepEqual(params.params[2], ['/trending']);
+    });
+
+    it('find_actor works', async () => {
+        const getParams = mockRpc(taiyiApi);
+        await taiyiApi.findActorAsync('actor1');
+        const params = getParams();
+        assert.equal(params.params[1], 'find_actor');
+        assert.deepEqual(params.params[2], ['actor1']);
+    });
+
+    it('find_nfa works', async () => {
+        const getParams = mockRpc(taiyiApi);
+        await taiyiApi.findNfaAsync(12345);
+        const params = getParams();
+        assert.equal(params.params[1], 'find_nfa');
+        assert.deepEqual(params.params[2], [12345]);
+    });
+
+    it('eval_nfa_action works', async () => {
+        const getParams = mockRpc(taiyiApi);
+        await taiyiApi.evalNfaActionAsync(12345, 'use', [1, 2]);
+        const params = getParams();
+        assert.equal(params.params[1], 'eval_nfa_action');
+        assert.deepEqual(params.params[2], [12345, 'use', [1, 2]]);
+    });
+
+    it('get_actor_needs works', async () => {
+        const getParams = mockRpc(taiyiApi);
+        await taiyiApi.getActorNeedsAsync('actor1');
+        const params = getParams();
+        assert.equal(params.params[1], 'get_actor_needs');
+        assert.deepEqual(params.params[2], ['actor1']);
+    });
+
+    it('find_way_to_zone works', async () => {
+        const getParams = mockRpc(taiyiApi);
+        await taiyiApi.findWayToZoneAsync('zone1', 'zone2');
+        const params = getParams();
+        assert.equal(params.params[1], 'find_way_to_zone');
+        assert.deepEqual(params.params[2], ['zone1', 'zone2']);
+    });
+
+    it('list_actor_friends works', async () => {
+        const getParams = mockRpc(taiyiApi);
+        await taiyiApi.listActorFriendsAsync('actor1', 50, true);
+        const params = getParams();
+        assert.equal(params.params[1], 'list_actor_friends');
+        assert.deepEqual(params.params[2], ['actor1', 50, true]);
+    });
+
+    it('get_relation_from_to_actor works', async () => {
+        const getParams = mockRpc(taiyiApi);
+        await taiyiApi.getRelationFromToActorAsync('actorA', 'actorB');
+        const params = getParams();
+        assert.equal(params.params[1], 'get_relation_from_to_actor');
+        assert.deepEqual(params.params[2], ['actorA', 'actorB']);
+    });
+
+    it('stat_people_by_zone works', async () => {
+        const getParams = mockRpc(taiyiApi);
+        await taiyiApi.statPeopleByZoneAsync('zone1');
+        const params = getParams();
+        assert.equal(params.params[1], 'stat_people_by_zone');
+        assert.deepEqual(params.params[2], ['zone1']);
+    });
+  });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@taiyinet/taiyi-js",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Taiyi.js the JavaScript API for Taiyi network",
   "main": "lib/index.js",
   "scripts": {
