@@ -12,8 +12,14 @@ console.log("Taiyi Account Simple Server");
 const app: Express = express();
 app.use(bodyParser.json() as RequestHandler);
 app.use(bodyParser.urlencoded({ extended: false }) as RequestHandler);
-// app.use(bodyParser.urlencoded({extended: false}));
-// app.use(bodyParser.json());
+
+// CORS support
+app.use((_req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    next();
+});
 
 function die(msg) { process.stderr.write(msg+'\n'); process.exit(1) }
 
@@ -30,17 +36,39 @@ app.post('/create_account', async (req, res) => {
 	var name = req.body.username?req.body.username:"";
 	var pass = req.body.password?req.body.password:"";
 
-	if(name == "" || pass == "") {
-		let e = "can not create new account without username and password";
-        console.warn(e);
-        res.send({status:false, err:e});
-        return;
-	}
+    var owner = req.body.owner?req.body.owner:"";
+    var active = req.body.active?req.body.active:"";
+    var posting = req.body.posting?req.body.posting:"";
+    var memo = req.body.memo?req.body.memo:"";
 
-    console.log(`[${(new Date()).toLocaleTimeString()}] new account for ${name}`);
+    var keys : any;
+    if(owner == "" || active == "" || posting == "" || memo == "") {
+        if(name == "" || pass == "") {
+            let e = "can not create new account without username and password";
+            console.warn(e);
+            res.send({status:false, err:e});
+            return;
+        }
+        console.log(`[${(new Date()).toLocaleTimeString()}] new account for ${name}`);
+        keys = taiyi.auth.generateKeys(name, pass, ['posting', 'active', 'owner', 'memo']);
+    }
+    else {
+        if(name == "") {
+            let e = "can not create new account without username";
+            console.warn(e);
+            res.send({status:false, err:e});
+            return;
+        }
+        console.log(`[${(new Date()).toLocaleTimeString()}] new account for ${name} with owner, active, posting, memo`);
+        keys = {
+            owner: owner,
+            active: active,
+            posting: posting,
+            memo: memo
+        };
+    }
 
     try {
-        const keys = taiyi.auth.generateKeys(name, pass, ['posting', 'active', 'owner', 'memo']);
         const chainProps = await taiyi.api.getChainPropertiesAsync()
         await taiyi.broadcast.accountCreateAsync(
             creator_key,
